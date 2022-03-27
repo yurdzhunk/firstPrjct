@@ -8,7 +8,9 @@ const Main = () => {
 
     const [userKey, setUserKey] = useState('');
     const [images, setImages] = useState([]);
-    const [liked, setLiked] = useState(false);
+    // const [liked, setLiked] = useState(false);
+    const [listOfLikes, setListOfLikes] = useState({});
+    const [liked, setLiked] = useState({});
 
 
     useEffect(async () => {
@@ -37,45 +39,108 @@ const Main = () => {
         } catch (error) {
             console.error('Error:', error);
         }
+
     }, [])
 
-    const renderItem = ({ item }) => (
+    useEffect( () => {
+        console.log('images length' + images.length)
+        if (images != null){
+            let a = {};
+            let b = {};
+            images.map((item, index) => {
+                a[item.picture_id] = item.rate
+                b[item.picture_id] = item.is_liked
+            })
+            console.log('a    ' + a)
+            console.log('b    ' + b)
+            setListOfLikes(a);
+            setLiked(b);
+            console.log('listOfLikes ' + listOfLikes);
+        }
+    }, [images])
+
+
+    const likeImage =  (id) => {
+        console.log('WORKS')
+        console.log(id)
+        let a = listOfLikes;
+        let b = liked;
+        if (b[id]) {
+            a[id] = a[id] - 1;
+            b[id]=false;
+            const response = fetch(
+                'https://536a-46-211-94-172.ngrok.io/pictures/' + id + '/like/',
+                {
+                    method: 'POST',
+                    headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Token ' + userKey,
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({'is_like': false})
+                    
+                }
+            );
+            console.log(response);
+        } else {
+            a[id] = a[id] + 1;
+            b[id] = true;
+            const response =  fetch(
+                'https://536a-46-211-94-172.ngrok.io/pictures/' + id + '/like/',
+                {
+                    method: 'POST',
+                    headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Token ' + userKey,
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({'is_like': true})
+                }
+            );
+            console.log('response')
+            console.log(response);
+        }
+        setListOfLikes({...a});
+        setLiked({...b});
+    }
+
+
+
+
+
+    const renderItem = ({ item, index }) => (
         <View style={styles.card}>
+            <View style={{ flexDirection: 'row', marginHorizontal: 5, marginVertical: 5}}>
+                <Image style={styles.avatar} source={{uri: item.owner.profile_picture_thumbnail_small}}/>
+                <Text style={{ fontWeight: 'bold', marginTop: 11, marginLeft: 5}}>{item.username}</Text>
+            </View>
             <Image style={styles.cardImage} source={{uri: item.thumbnail_big_url}}/>
             <View style={{ flexDirection: 'row'}}>
                 <TouchableOpacity
+                    onPress={() => likeImage(item.picture_id)}
                     style={{ marginHorizontal: 12, marginVertical: 12}}
-                    onPress={() => setLiked(!liked)}
-                    // style={styles.closeButton}
-                    // activeOpacity={0.7}
                 >
-                    {liked
+                    {liked[item.picture_id]
                         ?<FontAwesome name="heart" size={26} color="red" />
                         :<FontAwesome5 name="heart" size={26} color="black" />
                     }
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={{ marginHorizontal: 12, marginVertical: 13}}
-                    // onPress={() => cancelPreview()}
-                    // style={styles.closeButton}
-                    // activeOpacity={0.7}
                 >
                     <FontAwesome5 name="comment-alt" size={25} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={{ marginHorizontal: 12, marginVertical: 11}}
-                    // onPress={() => cancelPreview()}
-                    // style={styles.closeButton}
-                    // activeOpacity={0.7}
                 >
                     <FontAwesome5 name="share-square" size={25} color="black" />
                 </TouchableOpacity>
             </View>
             <View style={{ marginHorizontal: 12}}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold'}}>{item.rate} likes</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold'}}>{listOfLikes[item.picture_id]} likes</Text>
             </View>
             <Text style={styles.cardText}>
-                <Text style={{ fontWeight: 'bold'}}>{item.username}</Text> {item.description}
+                <Text style={{ fontWeight: 'bold'}}>{item.username}</Text> {item.description} {item.picture_id}
             </Text>
         </View>
     );
@@ -163,6 +228,15 @@ const styles = StyleSheet.create({
         padding: 10,
         fontSize: 16,
         marginHorizontal: 3
+    },
+    avatar: {
+        height: 35,
+        width: 35,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 3,
+        marginLeft: 3
     }
   });
 
