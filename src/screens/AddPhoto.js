@@ -148,7 +148,7 @@ const AddPhoto = ({navigation}) => {
 
         // let auth = await AsyncStorage.getItem('userKey');
         const response = await fetch(
-            'https://536a-46-211-94-172.ngrok.io/pictures/post_new/',
+            'https://daily-foto-shot.herokuapp.com/pictures/post_new/',
             {
                 method: 'POST',
                 headers: {

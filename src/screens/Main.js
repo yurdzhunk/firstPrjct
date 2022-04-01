@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { View, StyleSheet, Text, Image, ScrollView, Pressable, TouchableOpacity, Button, FlatList } from 'react-native';
 import Home from "./Home";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AntDesign, FontAwesome, Feather, FontAwesome5, Entypo} from "@expo/vector-icons";
+import { useScrollToTop } from '@react-navigation/native';
 
 const Main = () => {
 
@@ -11,6 +12,10 @@ const Main = () => {
     // const [liked, setLiked] = useState(false);
     const [listOfLikes, setListOfLikes] = useState({});
     const [liked, setLiked] = useState({});
+    const [isFetching, setIsFetching] = useState(false);
+    
+    const refFlatList = useRef(null);
+    useScrollToTop(refFlatList);
 
 
     useEffect(async () => {
@@ -20,7 +25,7 @@ const Main = () => {
             setUserKey(auth);
         }
 
-        const url = 'https://536a-46-211-94-172.ngrok.io/pictures/';
+        const url = 'https://daily-foto-shot.herokuapp.com/pictures/';
         // const data = { userKey: userKey };
 
         try {
@@ -69,7 +74,7 @@ const Main = () => {
             a[id] = a[id] - 1;
             b[id]=false;
             const response = fetch(
-                'https://536a-46-211-94-172.ngrok.io/pictures/' + id + '/like/',
+                'https://daily-foto-shot.herokuapp.com/pictures/' + id + '/like/',
                 {
                     method: 'POST',
                     headers: {
@@ -86,7 +91,7 @@ const Main = () => {
             a[id] = a[id] + 1;
             b[id] = true;
             const response =  fetch(
-                'https://536a-46-211-94-172.ngrok.io/pictures/' + id + '/like/',
+                'https://daily-foto-shot.herokuapp.com/pictures/' + id + '/like/',
                 {
                     method: 'POST',
                     headers: {
@@ -103,6 +108,34 @@ const Main = () => {
         setListOfLikes({...a});
         setLiked({...b});
     }
+
+
+    const refresh = async () => {
+        setIsFetching(true);
+
+        const url = 'https://daily-foto-shot.herokuapp.com/pictures';
+        // const data = { userKey: userKey };
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET', 
+
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const json = await response.json();
+            console.log('Success:', JSON.stringify(json));
+            let jsonObj = JSON.parse(JSON.stringify(json))
+            setImages(jsonObj.results)
+            console.log('images ' + images)
+        } catch (error) {
+            console.error('Error:', error);
+        }
+        
+        setIsFetching(false);
+    }
+
 
 
 
@@ -152,6 +185,9 @@ const Main = () => {
                 data={images}
                 renderItem={renderItem}
                 keyExtractor={item => String(item.picture_id)}
+                onRefresh={() => refresh()}
+                refreshing={isFetching}
+                ref={refFlatList}
             />
         </View>
     )

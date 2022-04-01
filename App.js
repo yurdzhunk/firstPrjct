@@ -11,6 +11,9 @@ import Main from './src/screens/Main';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AddPhoto from './src/screens/AddPhoto';
+import Album from './src/screens/Album';
+import Category from './src/screens/Category';
+import Voter from './src/screens/Voter'
 
 export default function App() {
 
@@ -43,6 +46,9 @@ useEffect(async () => {
   
     switch (route.name) {
       case 'Main':
+        iconName = 'home';
+        break;
+        case 'Album':
         iconName = 'picture';
         break;
       case 'Photo':
@@ -65,6 +71,9 @@ useEffect(async () => {
     switch (route.name) {
       case 'Main':
         titleName = 'Photos';
+        break;
+        case 'Album':
+        titleName = 'Album';
         break;
       case 'Photo':
         titleName = 'Add photo';
@@ -95,8 +104,25 @@ useEffect(async () => {
 
        >
         <Tab.Screen name="Main" component={Main}/>
+        <Tab.Screen name="Album" component={Album}/>
         <Tab.Screen name="Photo" component={AddPhoto}/>
         <Tab.Screen name="Profile" component={Profile}/>
+        <Tab.Screen
+            name="Category"
+            component={Category}
+            options={{
+              tabBarButton: () => null,
+              tabBarVisible: false, // if you don't want to see the tab bar
+            }}
+        />
+        <Tab.Screen
+            name="Voter"
+            component={Voter}
+            options={{
+              tabBarButton: () => null,
+              tabBarVisible: false, // if you don't want to see the tab bar
+            }}
+        />
       </Tab.Navigator>
   </NavigationContainer>
   );

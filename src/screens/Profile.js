@@ -107,7 +107,7 @@ const Profile = () => {
     const loginUser = async () => {
         try {
             const response = await fetch(
-              'https://536a-46-211-94-172.ngrok.io/api/accounts/login/',
+              'https://daily-foto-shot.herokuapp.com/api/accounts/login/',
               {
                 method: 'POST',
                 headers: {

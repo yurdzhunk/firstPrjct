@@ -3,7 +3,11 @@ import { Text, FlatList, View, StyleSheet } from 'react-native';
 import InputForm from '../Components/InputForm';
 import Post from '../Components/Post';
 
-const Home = () => {
+const Home = ({navigation, route}) => {
+
+
+    const {category} = route.params;
+
 
     const [postsSet, setPostsSet] = useState([]);
 
@@ -23,6 +27,7 @@ const Home = () => {
 
     return (
         <View style={styles.container}>
+          <Text>{category} mfklsjfklsjnklf</Text>
             <InputForm addPost={addPost} />
             <FlatList 
             data={postsSet}
