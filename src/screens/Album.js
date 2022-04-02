@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Animated } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
@@ -11,14 +11,59 @@ import sky from '../../assets/sky.jpeg';
 const Album = ({navigation}) => {
 
 
+    // const categories = [{'name': 'Breakfast' , 'image': breakfast},
+    //                     {'name': 'Dinner' , 'image': dinner},
+    //                     {'name': 'Supper' , 'image': supper},
+    //                     {'name': 'Coffee' , 'image': coffee},
+    //                     {'name': 'Sky' , 'image': sky}]
+
+    const [categories, setCategories] = useState([]);
+    const [categoriesWorld, setCategoriesWorld] = useState([]);
+    const [categoriesFriends, setCategoriesFriends] = useState([]);
+
+
+    useEffect(async () => {
+
+        // let auth = await AsyncStorage.getItem('userKey')
+        // if (auth != null) {
+        //     setUserKey(auth);
+        // }
+
+        const url = 'https://4d7c-178-95-82-235.ngrok.io/categories/';
+        // const data = { userKey: userKey };
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET', // или 'PUT'
+                // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const json = await response.json();
+            console.log('SuccessCATEGORYSuccessCATEGORYSuccessCATEGORYSuccessCATEGORYSuccessCATEGORY:', JSON.stringify(json));
+            let jsonObj = JSON.parse(JSON.stringify(json))
+            setCategories(jsonObj.results)
+            // console.log('images ' + images)
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
+    }, [])
+
+    useEffect(() => {
+        let a = categories.filter(obj => {
+        return obj.is_world === true
+        })
+        let b = categories.filter(obj => {
+            return obj.is_friends === true
+        })
+        setCategoriesWorld(a);
+        setCategoriesFriends(b);
+    }, [categories]);
+
+
     //Animation//////////////////////
-    const categories = [{'name': 'Breakfast' , 'image': breakfast},
-                        {'name': 'Dinner' , 'image': dinner},
-                        {'name': 'Supper' , 'image': supper},
-                        {'name': 'Coffee' , 'image': coffee},
-                        {'name': 'Sky' , 'image': sky}]
-
-
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
     const fadeIn = Animated.timing(fadeAnim, {
@@ -46,9 +91,8 @@ const Album = ({navigation}) => {
     //////////////////////////
 
 
-    const selectedCategory = (name, category) => {
-        console.log('name    ' + name)
-        navigation.navigate('Category', {'name': name, 'category': category})
+    const selectedCategory = (category_id) => {
+        navigation.navigate('Category', {'category': category_id})
     }
 
     return (
@@ -73,11 +117,11 @@ const Album = ({navigation}) => {
                         </Animated.View>
                 </View>
                 {
-                    categories.map((item, index) => {
+                    categoriesWorld.map((item, index) => {
                         return( 
-                                <TouchableOpacity key={index} style={styles.card} onPress={() => selectedCategory(item.name, 'World')}>
-                                    <ImageBackground source={item.image} style={{flex: 1, resizeMode: 'cover', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
-                                        <Text style={{ fontSize: 32, fontWeight: 'bold' , color: 'white', textShadowColor: '#000', textShadowRadius: 10}}>{item.name}</Text>
+                                <TouchableOpacity key={index} style={styles.card} onPress={() => selectedCategory(item.category_id)}>
+                                    <ImageBackground source={{ uri : item.cover_image_thumbnail_small_url}} style={{flex: 1, resizeMode: 'cover', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
+                                        <Text style={{ fontSize: 32, fontWeight: 'bold' , color: 'white', textShadowColor: '#000', textShadowRadius: 10}}>{item.title}</Text>
                                     </ImageBackground>
                                 </TouchableOpacity>
                         )
@@ -104,11 +148,11 @@ const Album = ({navigation}) => {
                         <Text style={{ fontSize: 32, fontWeight: 'bold' , color: '#000', marginLeft: '10%'}}>FRIENDS</Text>
                 </View>
                 {
-                    categories.map((item, index) => {
+                    categoriesFriends.map((item, index) => {
                         return( 
-                                <TouchableOpacity key={index} style={styles.card} onPress={() => selectedCategory(item.name, 'Friends')}>
-                                    <ImageBackground source={item.image} style={{flex: 1, resizeMode: 'cover', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
-                                        <Text style={{ fontSize: 32, fontWeight: 'bold' , color: 'white', textShadowColor: '#000', textShadowRadius: 10}}>{item.name}</Text>
+                                <TouchableOpacity key={index} style={styles.card} onPress={() => selectedCategory(item.category_id)}>
+                                    <ImageBackground source={{uri : item.cover_image_thumbnail_small_url}} style={{flex: 1, resizeMode: 'cover', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
+                                        <Text style={{ fontSize: 32, fontWeight: 'bold' , color: 'white', textShadowColor: '#000', textShadowRadius: 10}}>{item.title}</Text>
                                     </ImageBackground>
                                 </TouchableOpacity>
                         )

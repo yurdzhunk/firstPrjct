@@ -3,16 +3,16 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const Category = ({navigation, route}) => {
 
-    const {name, category} = route.params;
+    const {category} = route.params;
 
     const vote = () => {
-        navigation.navigate('Voter', {'name': name, 'category': category})
+        navigation.navigate('Voter', {'category': category})
     }
 
     return (
         <View>
             <View style={{ alignItems: 'center'}}>
-                <Text style={{ fontSize: 32, fontWeight: 'bold'}}>{category} {name}</Text>
+                <Text style={{ fontSize: 32, fontWeight: 'bold'}}>{category}</Text>
             </View>
             <TouchableOpacity style={styles.btn} onPress={() => vote()}>
                 <View>
