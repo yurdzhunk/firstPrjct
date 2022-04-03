@@ -8,7 +8,8 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 
 
-const Profile = () => {
+
+const StartPage = ({navigation}) => {
 
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -61,12 +62,15 @@ const Profile = () => {
     const [birthday, setBirthday] = useState('');
     const [agreement, setAgreement] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
+    const [urlMain, setUrlMain] = useState('https://c399-46-211-102-100.ngrok.io');
 
     useEffect(async () => {
         let auth = await AsyncStorage.getItem('userKey')
         if (auth != null) {
             setIsAuth(true);
+            navigation.navigate('Main');
         }
+        await AsyncStorage.setItem('urlMain', 'https://c399-46-211-102-100.ngrok.io');
     }, [])
 
     const clickOnCheckbox = () => {
@@ -77,7 +81,7 @@ const Profile = () => {
     const registerUser = async () => {
         try {
             const response = await fetch(
-              'https://daily-foto-shot.herokuapp.com/api/accounts/register/',
+              urlMain + '/api/accounts/register/',
               {
                 method: 'POST',
                 headers: {
@@ -99,6 +103,7 @@ const Profile = () => {
             console.log(json);
             await AsyncStorage.setItem('userKey', json.key);
             setIsAuth(true);
+            navigation.navigate('Main');
           } catch (error) {
             console.error('ERROR');
             }
@@ -107,7 +112,7 @@ const Profile = () => {
     const loginUser = async () => {
         try {
             const response = await fetch(
-              'https://daily-foto-shot.herokuapp.com/api/accounts/login/',
+              urlMain + '/api/accounts/login/',
               {
                 method: 'POST',
                 headers: {
@@ -124,6 +129,7 @@ const Profile = () => {
             console.log(json);
             await AsyncStorage.setItem('userKey', json.key);
             setIsAuth(true);
+            navigation.navigate('Main');
           } catch (error) {
             console.error('ERROR');
             }
@@ -137,14 +143,14 @@ const Profile = () => {
     return (    
                 <View style={styles.rootView}>
                     <ImageBackground source={image} style={{flex: 1}} blurRadius={0}>
-                        {isAuth
+                        {/* {isAuth
                         ? <View style={styles.loginForm}>
                             <Text style={{ fontSize: 26, textAlign: 'center', marginBottom: 15, color: 'white', fontWeight: 'bold', textShadowColor: '#000', textShadowRadius: 10}}>Welcome</Text>
                             <TouchableOpacity style={styles.button} onPress={() => logOutUser()}>
                                 <Text style={{color: 'white', fontWeight: 'bold'}}>Log out</Text>
                             </TouchableOpacity>
-                          </View>
-                        : <PagerView style={styles.pagerView} initialPage={0}>
+                          </View> */}
+                        <PagerView style={styles.pagerView} initialPage={0}>
                             <View key="1">
                                 <View style={styles.loginForm} key="1">
                                     <View>
@@ -163,7 +169,6 @@ const Profile = () => {
                                     </View>
                                     <Animated.View
                                             style={[
-                                            styles.fadingContainer,
                                             {
                                                 // Bind opacity to animated value
                                                 opacity: fadeAnim,
@@ -174,7 +179,7 @@ const Profile = () => {
                                             ]}
                                         >
                                             <Text style={{color: 'white', fontSize: 26}}>
-                                                Swipe right for Sign up 
+                                                Swipe for Sign up
                                             </Text>
                                             <AntDesign name='right' size={32} color='#fff' style={{ marginLeft: 26}} />
                                     </Animated.View>
@@ -220,7 +225,6 @@ const Profile = () => {
                                     </View>
                                     <Animated.View
                                             style={[
-                                            styles.fadingContainer,
                                             {
                                                 // Bind opacity to animated value
                                                 opacity: fadeAnim,
@@ -232,7 +236,7 @@ const Profile = () => {
                                         >
                                             <AntDesign name='left' size={32} color='#fff' style={{ marginRight: 26}} />
                                             <Text style={{color: 'white', fontSize: 26}}> 
-                                                Swipe left for Sign in
+                                                Swipe for Sign in
                                             </Text>
                                     </Animated.View>
                             </View>
@@ -240,7 +244,7 @@ const Profile = () => {
                       </PagerView>
                       
                         
-                        }
+                        
                     </ImageBackground>
                 </View>
     );
@@ -288,4 +292,4 @@ const styles = StyleSheet.create({
       }
 })
 
-export default Profile;
+export default StartPage;

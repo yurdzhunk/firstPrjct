@@ -13,26 +13,41 @@ const Main = () => {
     const [listOfLikes, setListOfLikes] = useState({});
     const [liked, setLiked] = useState({});
     const [isFetching, setIsFetching] = useState(false);
+    const [urlMain, setUrlMain] = useState('');
     
     const refFlatList = useRef(null);
     useScrollToTop(refFlatList);
 
-
-    useEffect(async () => {
-
+    useEffect( async () => {
         let auth = await AsyncStorage.getItem('userKey')
         if (auth != null) {
             setUserKey(auth);
+            console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + auth)
         }
+        let url = await AsyncStorage.getItem('urlMain')
+        if (url != null) {
+            setUrlMain(url);
+            console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + url)
+        }
+    }, []);
 
-        const url = 'https://daily-foto-shot.herokuapp.com/pictures/';
+    useEffect(async () => {
+
+        // let auth = await AsyncStorage.getItem('userKey')
+        // if (auth != null) {
+        //     setUserKey(auth);
+        //     console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + userKey)
+        // }
+        const url = await AsyncStorage.getItem('urlMain')
         // const data = { userKey: userKey };
 
         try {
-            const response = await fetch(url, {
+            const response = await fetch(url + '/pictures/', {
                 method: 'GET', // или 'PUT'
                 // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
                 headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Token ' + userKey,
                     'Content-Type': 'application/json'
                 }
             });
@@ -40,29 +55,45 @@ const Main = () => {
             console.log('Success:', JSON.stringify(json));
             let jsonObj = JSON.parse(JSON.stringify(json))
             setImages(jsonObj.results)
-            console.log('images ' + images)
+            console.log('IMAGESIMAGESIMAGESIMAGESIMAGESIMAGESIMAGES ' + images)
+            /////////////////
+            console.log('images length' + images.length)
+            if (images != null){
+                let a = {};
+                let b = {};
+                images.map((item, index) => {
+                    a[item.picture_id] = item.rate
+                    b[item.picture_id] = item.is_liked
+                })
+                console.log('a    ' + a)
+                console.log('b    ' + b)
+                setListOfLikes(a);
+                setLiked(b);
+                console.log('listOfLikes ' + listOfLikes);
+            }
+            ///////////////////////
         } catch (error) {
             console.error('Error:', error);
         }
 
-    }, [])
+    }, [userKey])
 
-    useEffect( () => {
-        console.log('images length' + images.length)
-        if (images != null){
-            let a = {};
-            let b = {};
-            images.map((item, index) => {
-                a[item.picture_id] = item.rate
-                b[item.picture_id] = item.is_liked
-            })
-            console.log('a    ' + a)
-            console.log('b    ' + b)
-            setListOfLikes(a);
-            setLiked(b);
-            console.log('listOfLikes ' + listOfLikes);
-        }
-    }, [images])
+    // useEffect( () => {
+    //     console.log('images length' + images.length)
+    //     if (images != null){
+    //         let a = {};
+    //         let b = {};
+    //         images.map((item, index) => {
+    //             a[item.picture_id] = item.rate
+    //             b[item.picture_id] = item.is_liked
+    //         })
+    //         console.log('a    ' + a)
+    //         console.log('b    ' + b)
+    //         setListOfLikes(a);
+    //         setLiked(b);
+    //         console.log('listOfLikes ' + listOfLikes);
+    //     }
+    // }, [images])
 
 
     const likeImage =  (id) => {
@@ -74,7 +105,7 @@ const Main = () => {
             a[id] = a[id] - 1;
             b[id]=false;
             const response = fetch(
-                'https://daily-foto-shot.herokuapp.com/pictures/' + id + '/like/',
+                urlMain + '/pictures/' + id + '/like/',
                 {
                     method: 'POST',
                     headers: {
@@ -91,7 +122,7 @@ const Main = () => {
             a[id] = a[id] + 1;
             b[id] = true;
             const response =  fetch(
-                'https://daily-foto-shot.herokuapp.com/pictures/' + id + '/like/',
+                urlMain + '/pictures/' + id + '/like/',
                 {
                     method: 'POST',
                     headers: {
@@ -113,14 +144,15 @@ const Main = () => {
     const refresh = async () => {
         setIsFetching(true);
 
-        const url = 'https://daily-foto-shot.herokuapp.com/pictures';
         // const data = { userKey: userKey };
 
         try {
-            const response = await fetch(url, {
+            const response = await fetch(urlMain + '/pictures/', {
                 method: 'GET', 
 
                 headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Token ' + userKey,
                     'Content-Type': 'application/json'
                 }
             });

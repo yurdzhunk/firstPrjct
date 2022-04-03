@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Animated } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import breakfast from '../../assets/breakfast.jpeg';
 import dinner from '../../assets/dinner.jpeg';
 import supper from '../../assets/supper.jpeg';
@@ -20,47 +21,65 @@ const Album = ({navigation}) => {
     const [categories, setCategories] = useState([]);
     const [categoriesWorld, setCategoriesWorld] = useState([]);
     const [categoriesFriends, setCategoriesFriends] = useState([]);
+    const [userKey, setUserKey] = useState('');
+    const [urlMain, setUrlMain] = useState(null);
+
+
+    useEffect( async () => {
+        const auth = await AsyncStorage.getItem('userKey')
+        if (auth != null) {
+            setUserKey(auth);
+            console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + userKey)
+        }
+        let url = await AsyncStorage.getItem('urlMain')
+        if (url != null) {
+            setUrlMain(url);
+            console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + url)
+        }
+    }, []);
 
 
     useEffect(async () => {
-
-        // let auth = await AsyncStorage.getItem('userKey')
-        // if (auth != null) {
-        //     setUserKey(auth);
-        // }
-
-        const url = 'https://4d7c-178-95-82-235.ngrok.io/categories/';
-        // const data = { userKey: userKey };
-
-        try {
-            const response = await fetch(url, {
-                method: 'GET', // или 'PUT'
-                // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            const json = await response.json();
-            console.log('SuccessCATEGORYSuccessCATEGORYSuccessCATEGORYSuccessCATEGORYSuccessCATEGORY:', JSON.stringify(json));
-            let jsonObj = JSON.parse(JSON.stringify(json))
-            setCategories(jsonObj.results)
-            // console.log('images ' + images)
-        } catch (error) {
-            console.error('Error:', error);
+        
+        if(urlMain!=null){
+            try {
+                const response = await fetch(urlMain + '/categories/', {
+                    method: 'GET', // или 'PUT'
+                    // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Token ' + userKey,
+                        'Content-Type': 'application/json'
+                    }
+                }).then((response) => response.json())
+                .then((json) => JSON.parse(JSON.stringify(json)))
+                .then((obj) => setCategories(obj.results));
+                // const json = await response.json();
+                // console.log('SuccessCATEGORYSuccessCATEGORYSuccessCATEGORYSuccessCATEGORYSuccessCATEGORY:', JSON.stringify(json));
+                // let jsonObj = JSON.parse(JSON.stringify(json))
+                // setCategories(jsonObj.results)
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
-
-    }, [])
+    }, [userKey, urlMain])
 
     useEffect(() => {
-        let a = categories.filter(obj => {
-        return obj.is_world === true
-        })
-        let b = categories.filter(obj => {
-            return obj.is_friends === true
-        })
-        setCategoriesWorld(a);
-        setCategoriesFriends(b);
+        console.log('IMAGESIMAGESIMAGESIMAGESIMAGESIMAGES ' + categories)
+        if(categories!=null){
+            let a = categories.filter(obj => {
+                return obj.is_world === true
+                })
+            let b = categories.filter(obj => {
+                return obj.is_friends === true
+            })
+            setCategoriesWorld(a);
+            setCategoriesFriends(b);
+        }
     }, [categories]);
+
+
+
 
 
     //Animation//////////////////////

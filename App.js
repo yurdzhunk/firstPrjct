@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
-import { StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { StyleSheet, View} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Navbar from './src/Components/Navbar';
 import Home from './src/screens/Home';
-import Profile from './src/screens/Profile';
+import StartPage from './src/screens/StartPage';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { useFonts } from 'expo-font';
 import Main from './src/screens/Main';
@@ -14,25 +14,31 @@ import AddPhoto from './src/screens/AddPhoto';
 import Album from './src/screens/Album';
 import Category from './src/screens/Category';
 import Voter from './src/screens/Voter'
+import ProfilePage from './src/screens/ProfilePage';
 
 export default function App() {
 
+  const [userKey, setUserKey] = useState('');
+  const [isAuth, setIsAuth] = useState(false);
 
-const getUserKey = async (key) => {
-    try {
-        console.log('get')
-        const value = await AsyncStorage.getItem(key)
-        if(value !== null) {
-          console.log('value   ' + value)
-        }
-      } catch(e) {
-        console.log('error read')
-      }
-}
 
-useEffect(async () => {
-    getUserKey('userKey');
-}, [])
+  // const getUserKey = async (key) => {
+  //     try {
+  //         console.log('get')
+  //         const value = await AsyncStorage.getItem(key)
+  //         if(value !== null) {
+  //           console.log('value   ' + value)
+  //           setUserKey(value);
+  //           setIsAuth(true);
+  //         }
+  //       } catch(e) {
+  //         console.log('is not authorized')
+  //       }
+  // }
+
+  // useEffect(async () => {
+  //     getUserKey('userKey');
+  // }, [])
 
 
   const [loaded] = useFonts({
@@ -88,44 +94,53 @@ useEffect(async () => {
     return titleName
   }
 
-  return (
-
-    <NavigationContainer>
-      <StatusBar style='dark' />
-      <Navbar />
-      <Tab.Navigator
-        screenOptions={({route}) => ({
-          tabBarIcon: ({color}) => screenOptions(route, color),
-          tabBarHideOnKeyboard: false,
-          tabBarStyle: [{display: 'flex'}],
-          headerTitle: titleOptions(route),
-          headerShown: false
-      })}
-
-       >
-        <Tab.Screen name="Main" component={Main}/>
-        <Tab.Screen name="Album" component={Album}/>
-        <Tab.Screen name="Photo" component={AddPhoto}/>
-        <Tab.Screen name="Profile" component={Profile}/>
-        <Tab.Screen
-            name="Category"
-            component={Category}
-            options={{
-              tabBarButton: () => null,
-              tabBarVisible: false, // if you don't want to see the tab bar
-            }}
-        />
-        <Tab.Screen
-            name="Voter"
-            component={Voter}
-            options={{
-              tabBarButton: () => null,
-              tabBarVisible: false, // if you don't want to see the tab bar
-            }}
-        />
-      </Tab.Navigator>
-  </NavigationContainer>
-  );
+ 
+    return (
+      <NavigationContainer>
+        <StatusBar style='dark' />
+        <Navbar />
+        <Tab.Navigator
+          screenOptions={({route}) => ({
+            tabBarIcon: ({color}) => screenOptions(route, color),
+            tabBarHideOnKeyboard: false,
+            tabBarStyle: [{display: 'flex'}],
+            headerTitle: titleOptions(route),
+            headerShown: false,
+        })}
+        >
+          <Tab.Screen
+              name="StartPage"
+              component={StartPage}
+              options={{
+                tabBarButton: () => null,
+                tabBarVisible: false, // if you don't want to see the tab bar
+                tabBarStyle: { display: "none" }
+              }}
+          />
+          <Tab.Screen name="Main" component={Main}/>
+          <Tab.Screen name="Album" component={Album}/>
+          <Tab.Screen name="Photo" component={AddPhoto}/>
+          <Tab.Screen name="Profile" component={ProfilePage}/>
+          <Tab.Screen
+              name="Category"
+              component={Category}
+              options={{
+                tabBarButton: () => null,
+                tabBarVisible: false, // if you don't want to see the tab bar
+              }}
+          />
+          <Tab.Screen
+              name="Voter"
+              component={Voter}
+              options={{
+                tabBarButton: () => null,
+                tabBarVisible: false, // if you don't want to see the tab bar
+              }}
+          />
+        </Tab.Navigator>
+    </NavigationContainer>
+    );
+  
 }
 
 const styles = StyleSheet.create({

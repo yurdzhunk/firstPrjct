@@ -4,6 +4,7 @@ import image from '../../assets/img.jpeg';
 import Carousel from 'react-native-snap-carousel';
 import {AntDesign, FontAwesome, Feather, FontAwesome5, Entypo} from "@expo/vector-icons";
 import Swiper from 'react-native-deck-swiper-renewed';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Voter = ({navigation, route}) => {
 
@@ -14,6 +15,22 @@ const Voter = ({navigation, route}) => {
     const [username, setUsername] = useState({});
     const [description, setDescription] = useState({});
     const width = Dimensions.get('window').width;
+    const [userKey, setUserKey] = useState('');
+    const [urlMain, setUrlMain] = useState('');
+
+
+    useEffect( async () => {
+        let auth = await AsyncStorage.getItem('userKey')
+        if (auth != null) {
+            setUserKey(auth);
+            console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + auth)
+        }
+        let url = await AsyncStorage.getItem('urlMain')
+        if (url != null) {
+            setUrlMain(url);
+            console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + url)
+        }
+    }, []);
 
     useEffect(async () => {
 
@@ -22,38 +39,40 @@ const Voter = ({navigation, route}) => {
         //     setUserKey(auth);
         // }
 
-        const url = 'https://4d7c-178-95-82-235.ngrok.io/pictures/?category=' + category;
         // const data = { userKey: userKey };
         console.log(category)
 
-        try {
-            const response = await fetch(url, {
-                method: 'GET', // или 'PUT'
-                // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            const json = await response.json();
-            console.log('Success:', JSON.stringify(json));
-            let jsonObj = JSON.parse(JSON.stringify(json))
-            setImages(jsonObj.results)
-            console.log(images)
-            // let a = []
-            // for (var k in images){
-            //     console.log(images[k].thumbnail_big_url)
-            //     a.push(images[k].thumbnail_big_url)
-            // }
-            // for (let i = 0; i < images.length; i++){
-            //     a.push(images[i].thumbnail_big_url)
-            // }
-            // setImages([...a])
-            // console.log('images ' + images)
-        } catch (error) {
-            console.error('Error:', error);
+        if(urlMain!=null){
+            try {
+                const response = await fetch(urlMain + '/pictures/pictures_with_filters/?category_id=' + category, {
+                    method: 'GET', // или 'PUT'
+                    // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Token ' + userKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const json = await response.json();
+                console.log('Success:', JSON.stringify(json));
+                let jsonObj = JSON.parse(JSON.stringify(json))
+                setImages(jsonObj.results)
+                console.log(images)
+                // let a = []
+                // for (var k in images){
+                //     console.log(images[k].thumbnail_big_url)
+                //     a.push(images[k].thumbnail_big_url)
+                // }
+                // for (let i = 0; i < images.length; i++){
+                //     a.push(images[i].thumbnail_big_url)
+                // }
+                // setImages([...a])
+                // console.log('images ' + images)
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
-
-    }, [category])
+    }, [userKey, category])
 
 
 
