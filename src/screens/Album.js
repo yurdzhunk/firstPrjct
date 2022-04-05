@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Animated } f
 import PagerView from 'react-native-pager-view';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Animatable from 'react-native-animatable';
 import breakfast from '../../assets/breakfast.jpeg';
 import dinner from '../../assets/dinner.jpeg';
 import supper from '../../assets/supper.jpeg';
@@ -138,11 +139,13 @@ const Album = ({navigation}) => {
                 {
                     categoriesWorld.map((item, index) => {
                         return( 
-                                <TouchableOpacity key={index} style={styles.card} onPress={() => selectedCategory(item.category_id)}>
-                                    <ImageBackground source={{ uri : item.cover_image_thumbnail_small_url}} style={{flex: 1, resizeMode: 'cover', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
-                                        <Text style={{ fontSize: 32, fontWeight: 'bold' , color: 'white', textShadowColor: '#000', textShadowRadius: 10}}>{item.title}</Text>
-                                    </ImageBackground>
-                                </TouchableOpacity>
+                                
+                                    <TouchableOpacity key={index} style={styles.card} onPress={() => selectedCategory(item.category_id)}>
+                                        <ImageBackground source={{ uri : item.cover_image_thumbnail_small_url}} style={{flex: 1, resizeMode: 'cover', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
+                                            <Text style={{ fontSize: 32, fontWeight: 'bold' , color: 'white', textShadowColor: '#000', textShadowRadius: 10}}>{item.title}</Text>
+                                        </ImageBackground>
+                                    </TouchableOpacity>
+                                
                         )
                     })
                 }

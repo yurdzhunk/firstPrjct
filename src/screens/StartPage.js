@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, Text, View, TextInput, ImageBackground, Dimensions, TouchableOpacity, Animated, Button} from 'react-native';
+import { StyleSheet, Text, View, TextInput, ImageBackground, Dimensions, TouchableOpacity, Animated, Button, Keyboard, TouchableWithoutFeedback} from 'react-native';
 import image from '../../assets/img.jpeg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import PagerView from 'react-native-pager-view';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import PasswordInputText from 'react-native-hide-show-password-input';
 
 
 
@@ -62,7 +63,7 @@ const StartPage = ({navigation}) => {
     const [birthday, setBirthday] = useState('');
     const [agreement, setAgreement] = useState(false);
     const [isAuth, setIsAuth] = useState(false);
-    const [urlMain, setUrlMain] = useState('https://c399-46-211-102-100.ngrok.io');
+    const [urlMain, setUrlMain] = useState('https://daily-foto-shot.herokuapp.com');
 
     useEffect(async () => {
         let auth = await AsyncStorage.getItem('userKey')
@@ -70,7 +71,7 @@ const StartPage = ({navigation}) => {
             setIsAuth(true);
             navigation.navigate('Main');
         }
-        await AsyncStorage.setItem('urlMain', 'https://c399-46-211-102-100.ngrok.io');
+        await AsyncStorage.setItem('urlMain', 'https://daily-foto-shot.herokuapp.com');
     }, [])
 
     const clickOnCheckbox = () => {
@@ -141,8 +142,8 @@ const StartPage = ({navigation}) => {
     }
 
     return (    
-                <View style={styles.rootView}>
-                    <ImageBackground source={image} style={{flex: 1}} blurRadius={0}>
+                <View style={styles.rootView} >
+                    <ImageBackground source={image} style={{flex: 1}} blurRadius={0} >
                         {/* {isAuth
                         ? <View style={styles.loginForm}>
                             <Text style={{ fontSize: 26, textAlign: 'center', marginBottom: 15, color: 'white', fontWeight: 'bold', textShadowColor: '#000', textShadowRadius: 10}}>Welcome</Text>
@@ -151,101 +152,106 @@ const StartPage = ({navigation}) => {
                             </TouchableOpacity>
                           </View> */}
                         <PagerView style={styles.pagerView} initialPage={0}>
-                            <View key="1">
-                                <View style={styles.loginForm} key="1">
-                                    <View>
-                                        <Text style={{ fontSize: 26, textAlign: 'center', marginBottom: 15, color: 'white', fontWeight: 'bold', textShadowColor: '#000', textShadowRadius: 10}}>Sign in form</Text>
+                            <View key="1" >
+                                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                                    <View style={styles.loginForm} key="1">
+                                        <View>
+                                            <Text style={{ fontSize: 26, textAlign: 'center', marginBottom: 15, color: 'white', fontWeight: 'bold', textShadowColor: '#000', textShadowRadius: 10}}>Sign in form</Text>
+                                        </View>
+                                        <View>
+                                            <TextInput keyboardType='email-address' clearButtonMode='always' style={styles.inp} value={email} placeholder='Email or Username' onChangeText={setEmail}/>
+                                        </View>
+                                        <View>
+                                            <TextInput secureTextEntry={true} clearButtonMode='always' style={styles.inp} value={password} placeholder='Password' onChangeText={setPassword}/>
+                                        </View>
+                                        <View style={{alignItems: 'center'}}>
+                                            <TouchableOpacity style={styles.button} onPress={() => loginUser()}>
+                                                <Text style={{color: 'white', fontWeight: 'bold'}}>Sign in</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        <Animated.View
+                                                style={[
+                                                {
+                                                    // Bind opacity to animated value
+                                                    opacity: fadeAnim,
+                                                    marginTop: '120%',
+                                                    alignItems: 'center',
+                                                    flexDirection: 'row'
+                                                }
+                                                ]}
+                                            >
+                                                <Text style={{color: 'white', fontSize: 26}}>
+                                                    Swipe for Sign up
+                                                </Text>
+                                                <AntDesign name='right' size={32} color='#fff' style={{ marginLeft: 26}} />
+                                        </Animated.View>
                                     </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={email} placeholder='Email or Username' onChangeText={setEmail}/>
-                                    </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={password} placeholder='Password' onChangeText={setPassword}/>
-                                    </View>
-                                    <View style={{alignItems: 'center'}}>
-                                        <TouchableOpacity style={styles.button} onPress={() => loginUser()}>
-                                            <Text style={{color: 'white', fontWeight: 'bold'}}>Sign in</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <Animated.View
-                                            style={[
-                                            {
-                                                // Bind opacity to animated value
-                                                opacity: fadeAnim,
-                                                marginTop: '120%',
-                                                alignItems: 'center',
-                                                flexDirection: 'row'
-                                            }
-                                            ]}
-                                        >
-                                            <Text style={{color: 'white', fontSize: 26}}>
-                                                Swipe for Sign up
-                                            </Text>
-                                            <AntDesign name='right' size={32} color='#fff' style={{ marginLeft: 26}} />
-                                    </Animated.View>
-                                </View>
+                                </TouchableWithoutFeedback>
                             </View>
                         <View  key="2">
-                            <View style={styles.loginForm} key="1">
-                                    <View>
-                                        <Text style={{ fontSize: 26, textAlign: 'center', marginBottom: 15, color: 'white', fontWeight: 'bold', textShadowColor: '#000', textShadowRadius: 10}}>Sign up form</Text>
-                                    </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={email} placeholder='Email' onChangeText={setEmail}/>
-                                    </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={password} placeholder='Password' onChangeText={setPassword}/>
-                                    </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={name} placeholder='Name' onChangeText={setName}/>
-                                    </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={surname} placeholder='Surname' onChangeText={setSurname}/>
-                                    </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={username} placeholder='Username' onChangeText={setUsername}/>
-                                    </View>
-                                    <View>
-                                        <TextInput style={styles.inp} value={birthday} placeholder='Date of birth' onChangeText={setBirthday}/>
-                                    </View>
-                                    <BouncyCheckbox
-                                        size={25}
-                                        fillColor="lightgreen"
-                                        unfillColor="#FFFFFF"
-                                        text="Agree with terms of usage"
-                                        iconStyle={{ borderColor: "grey" }}
-                                        textStyle={{ color: 'white',  textShadowColor: '#000', textShadowRadius: 10, textDecorationLine: "none"}}
-                                        style={{justifyContent: 'center'}}
-                                        onPress={() => clickOnCheckbox()}
-                                    />
-                                    <View style={{alignItems: 'center'}}>
-                                        <TouchableOpacity style={styles.button} onPress={() => registerUser()}>
-                                            <Text style={{color: 'white', fontWeight: 'bold'}}>Sign up</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <Animated.View
-                                            style={[
-                                            {
-                                                // Bind opacity to animated value
-                                                opacity: fadeAnim,
-                                                marginTop: '62%',
-                                                alignItems: 'center',
-                                                flexDirection: 'row'
-                                            }
-                                            ]}
-                                        >
-                                            <AntDesign name='left' size={32} color='#fff' style={{ marginRight: 26}} />
-                                            <Text style={{color: 'white', fontSize: 26}}> 
-                                                Swipe for Sign in
-                                            </Text>
-                                    </Animated.View>
-                            </View>
+                            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                                <View style={styles.loginForm} key="1">
+                                        <View>
+                                            <Text style={{ fontSize: 26, textAlign: 'center', marginBottom: 15, color: 'white', fontWeight: 'bold', textShadowColor: '#000', textShadowRadius: 10}}>Sign up form</Text>
+                                        </View>
+                                        <View>
+                                            <TextInput style={styles.inp} value={email} placeholder='Email' onChangeText={setEmail}/>
+                                        </View>
+                                        <View>
+                                            <TextInput style={styles.inp} value={password} placeholder='Password' onChangeText={setPassword}/>
+                                        </View>
+                                        <View>
+                                            <TextInput style={styles.inp} value={name} placeholder='Name' onChangeText={setName}/>
+                                        </View>
+                                        <View>
+                                            <TextInput style={styles.inp} value={surname} placeholder='Surname' onChangeText={setSurname}/>
+                                        </View>
+                                        <View>
+                                            <TextInput style={styles.inp} value={username} placeholder='Username' onChangeText={setUsername}/>
+                                        </View>
+                                        <View>
+                                            <TextInput style={styles.inp} value={birthday} placeholder='Date of birth' onChangeText={setBirthday}/>
+                                        </View>
+                                        <BouncyCheckbox
+                                            size={25}
+                                            fillColor="lightgreen"
+                                            unfillColor="#FFFFFF"
+                                            text="Agree with terms of usage"
+                                            iconStyle={{ borderColor: "grey" }}
+                                            textStyle={{ color: 'white',  textShadowColor: '#000', textShadowRadius: 10, textDecorationLine: "none"}}
+                                            style={{justifyContent: 'center'}}
+                                            onPress={() => clickOnCheckbox()}
+                                        />
+                                        <View style={{alignItems: 'center'}}>
+                                            <TouchableOpacity style={styles.button} onPress={() => registerUser()}>
+                                                <Text style={{color: 'white', fontWeight: 'bold'}}>Sign up</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        <Animated.View
+                                                style={[
+                                                {
+                                                    // Bind opacity to animated value
+                                                    opacity: fadeAnim,
+                                                    marginTop: '62%',
+                                                    alignItems: 'center',
+                                                    flexDirection: 'row'
+                                                }
+                                                ]}
+                                            >
+                                                <AntDesign name='left' size={32} color='#fff' style={{ marginRight: 26}} />
+                                                <Text style={{color: 'white', fontSize: 26}}> 
+                                                    Swipe for Sign in
+                                                </Text>
+                                        </Animated.View>
+                                </View>
+                            </TouchableWithoutFeedback>
                         </View>
                       </PagerView>
                       
                         
                         
                     </ImageBackground>
+                    
                 </View>
     );
 };

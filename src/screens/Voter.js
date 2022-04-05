@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, Button } from 'react-native';
 import image from '../../assets/img.jpeg';
 import Carousel from 'react-native-snap-carousel';
 import {AntDesign, FontAwesome, Feather, FontAwesome5, Entypo} from "@expo/vector-icons";
 import Swiper from 'react-native-deck-swiper-renewed';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Animatable from 'react-native-animatable';
 
 const Voter = ({navigation, route}) => {
 
@@ -16,7 +17,8 @@ const Voter = ({navigation, route}) => {
     const [description, setDescription] = useState({});
     const width = Dimensions.get('window').width;
     const [userKey, setUserKey] = useState('');
-    const [urlMain, setUrlMain] = useState('');
+    const [urlMain, setUrlMain] = useState(null);
+    const plusRef = useRef(null);
 
 
     useEffect( async () => {
@@ -72,7 +74,7 @@ const Voter = ({navigation, route}) => {
                 console.error('Error:', error);
             }
         }
-    }, [userKey, category])
+    }, [userKey, urlMain, category])
 
 
 
@@ -112,12 +114,14 @@ const Voter = ({navigation, route}) => {
         </>
     );
 
-
+    const animateHeart = () => {
+        plusRef.current.animate({ 0: { opacity: 0 }, 0.5: { opacity: 1 }, 1: { opacity: 0 } });
+    }
 
     return (
-        <View style={{flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
+        <Animatable.View animation='bounceInDown' key={category} style={{flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
             <Swiper
-                key={category + thumbnails}
+                key={category}// cahnge category on thumbnails
                 cards={thumbnails}
                 renderCard={renderItem}
                 onSwiped={(cardIndex) => {console.log(cardIndex)}}
@@ -127,15 +131,18 @@ const Voter = ({navigation, route}) => {
                 stackSize={3}
                 verticalSwipe={false}
                 animateCardOpacity={true}
+                onSwipedRight={animateHeart}
+                // onSwiping={animateHeart}
             >
             </Swiper>
-            <Text style={{ position: 'absolute', bottom: 3, left: 3, fontSize:32}}>
+            <Animatable.Text ref={plusRef} style={{ position: 'absolute', top: 3, right: 10, fontSize:32, opacity: 0, color: 'green'} }><Entypo name="plus" size={24} color="green" />1</Animatable.Text>
+            {/* <Text style={{ position: 'absolute', bottom: 3, left: 3, fontSize:32}}>
                 <AntDesign name='left' size={32} color='#000' style={{ marginLeft: 26}} />Nope
             </Text>
             <Text style={{ position: 'absolute', bottom: 3, right: 3, fontSize:32}}>
                 Like<AntDesign name='right' size={32} color='#000' style={{ marginLeft: 26}} />
-            </Text>
-        </View>
+            </Text> */}
+        </Animatable.View>
     );
 };
 
