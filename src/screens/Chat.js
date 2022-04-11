@@ -1,11 +1,15 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, FlatList, KeyboardAvoidingView } from 'react-native';
-import { AntDesign, Entypo } from '@expo/vector-icons';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
+import { AntDesign, Entypo, FontAwesome } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useIsFocused } from '@react-navigation/native'
+import { Input } from '@rneui/base';
+import useKeyboardHeight from 'react-native-use-keyboard-height';
 
 
 const Chat = ({navigation, route}) => {
+
+    const h = useKeyboardHeight();
 
     const { userID, avatar, nickname, chatKey, chatID, mainUserID, mainUsername, userKey, urlMain, mainFirstName } = route.params;
     const [serverState, setServerState] = useState('Loading...');
@@ -144,7 +148,7 @@ const Chat = ({navigation, route}) => {
 
     return (
         <View style={{ flex: 1}}>
-            <View style={{flex: 1,flexDirection: 'row', backgroundColor: '#fff', justifyContent: 'center'}}>
+            <View style={{flexDirection: 'row', backgroundColor: '#fff', justifyContent: 'center'}}>
                 <TouchableOpacity style={{position: 'absolute', left: 5, top: 5}} onPress={() => navigation.navigate('ChatsScreen')}>
                     <Text style={{fontSize: 18}}><AntDesign name='left' size={26} color='#000' /> Back</Text>
                 </TouchableOpacity>
@@ -154,32 +158,48 @@ const Chat = ({navigation, route}) => {
                 <View >
                     <Text style={{ fontWeight: 'bold', marginTop: 13, marginLeft: 5}}>{nickname}</Text>
                 </View>
-                <TouchableOpacity style={{position: 'absolute', right: 5, top: 5}} onPress={submitMessage}>
-                    <Text style={{fontSize: 18}}>Send</Text>
-                </TouchableOpacity>
             </View>
-            <View style={{flex: 8}}>
-                <FlatList
-                    initialNumToRender={10}
-                    inverted
-                    data={serverMessages.slice().sort(
-                        (a,b) => a[3].valueOf() - b[3].valueOf()
-                        ).reverse()}
-                    renderItem={renderItem}
-                    keyExtractor={keyExtractor}
-                />
-            </View>
-            <View style={{flex: 1, backgroundColor: '#fff', paddingTop: 5, paddingLeft: 5}}>
-                <TextInput 
-                    style={{fontSize: 24}}
-                    placeholder='Type message...'
-                    value={messageText}
-                    onChangeText={value => {
-                        setMessageText(value);
-                        console.log(value);
-                    }}
-                />
-            </View>
+            <KeyboardAvoidingView
+                behavior={'padding'}
+                style={{display: 'flex', flex: 9}}
+                keyboardVerticalOffset={
+                    Platform.select({
+                       ios: () => 70,
+                       android: () => 200
+                    })()
+                }
+            >
+                <View style={{flex: 8}}>
+                    <FlatList
+                        initialNumToRender={10}
+                        inverted
+                        data={serverMessages.slice().sort(
+                            (a,b) => a[3].valueOf() - b[3].valueOf()
+                            ).reverse()}
+                        renderItem={renderItem}
+                        keyExtractor={keyExtractor}
+                    />
+                </View>
+                <View style={{flex: 1, backgroundColor: '#fff', paddingTop: 5, paddingLeft: 5, flexDirection: 'row'}}>
+                    <View style={{flex:9}}>
+                        <Input 
+                            autoCorrect={false}
+                            style={{fontSize: 24}}
+                            placeholder='Type message...'
+                            value={messageText}
+                            onChangeText={value => {
+                                setMessageText(value);
+                                console.log(value);
+                            }}
+                        />
+                    </View>
+                    <View style={{flex:1}}>
+                        <TouchableOpacity style={{position: 'absolute', right: 15, top: 10}} onPress={submitMessage}>
+                            <FontAwesome name="send" size={24} color="black" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </KeyboardAvoidingView>
         </View>
     );
 };
