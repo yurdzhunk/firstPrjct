@@ -9,8 +9,8 @@ import * as Animatable from 'react-native-animatable';
 
 const Voter = ({navigation, route}) => {
 
-    const {category} = route.params;
-    const [images, setImages] = useState([]);
+    const {category, is_friends} = route.params;
+    const [images, setImages] = useState(null);
     const [thumbnails, setThumbnails] = useState([]);
     const [profilePic, setProfilePic] = useState({});
     const [username, setUsername] = useState({});
@@ -46,14 +46,14 @@ const Voter = ({navigation, route}) => {
 
         if(urlMain!=null){
             try {
-                const response = await fetch(urlMain + '/pictures/pictures_with_filters/?category_id=' + category, {
+                const response = await fetch(urlMain + '/pictures/category_page/?category_id=' + category + '&is_friends=' + is_friends, {
                     method: 'GET', // или 'PUT'
                     // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': 'Token ' + userKey,
                         'Content-Type': 'application/json'
-                    }
+                    },
                 });
                 const json = await response.json();
                 console.log('Success:', JSON.stringify(json));
@@ -80,22 +80,24 @@ const Voter = ({navigation, route}) => {
 
 
     useEffect(() => {
-        console.log('images LENGTH' + images.length)
-        let a = []
-        let b = {}
-        let c = {}
-        let d = {}
-            for (var k in images){
-                console.log(images[k].thumbnail_big_url)
-                a.push(images[k].thumbnail_big_url)
-                b[images[k].thumbnail_big_url] = images[k].owner.profile_picture_thumbnail_big
-                c[images[k].thumbnail_big_url] = images[k].username
-                d[images[k].thumbnail_big_url] = images[k].description
-            }
-        setThumbnails([...a])
-        setProfilePic(b)
-        setUsername(c)
-        setDescription(d);
+        if(images!=null){
+            console.log('images LENGTH' + images.length)
+            let a = []
+            let b = {}
+            let c = {}
+            let d = {}
+                for (var k in images){
+                    console.log(images[k].thumbnail_big_url)
+                    a.push(images[k].thumbnail_big_url)
+                    b[images[k].thumbnail_big_url] = images[k].owner.profile_picture_thumbnail_big
+                    c[images[k].thumbnail_big_url] = images[k].username
+                    d[images[k].thumbnail_big_url] = images[k].description
+                }
+            setThumbnails([...a])
+            setProfilePic(b)
+            setUsername(c)
+            setDescription(d);
+        }
     }, [images])
 
     

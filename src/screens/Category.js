@@ -8,7 +8,7 @@ const Category = ({navigation, route}) => {
     const {category} = route.params;
 
     const vote = () => {
-        navigation.navigate('Voter', {'category': category})
+        navigation.navigate('Voter', {'category': category, 'is_friends': false})
     }
 
     return (

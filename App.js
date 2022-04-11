@@ -15,6 +15,8 @@ import Album from './src/screens/Album';
 import Category from './src/screens/Category';
 import Voter from './src/screens/Voter'
 import ProfilePage from './src/screens/ProfilePage';
+import ChatsScreen from './src/screens/ChatsScreen';
+import Chat from './src/screens/Chat';
 
 export default function App() {
 
@@ -135,6 +137,24 @@ export default function App() {
               options={{
                 tabBarButton: () => null,
                 tabBarVisible: false, // if you don't want to see the tab bar
+              }}
+          />
+           <Tab.Screen
+              name="ChatsScreen"
+              component={ChatsScreen}
+              options={{
+                tabBarButton: () => null,
+                // tabBarVisible: false, // if you don't want to see the tab bar
+                // tabBarStyle: { display: "none" }
+              }}
+          />
+          <Tab.Screen
+              name="Chat"
+              component={Chat}
+              options={{
+                tabBarButton: () => null,
+                // tabBarVisible: false, // if you don't want to see the tab bar
+                // tabBarStyle: { display: "none" }
               }}
           />
         </Tab.Navigator>

@@ -13,7 +13,7 @@ const Main = () => {
     const [listOfLikes, setListOfLikes] = useState({});
     const [liked, setLiked] = useState({});
     const [isFetching, setIsFetching] = useState(false);
-    const [urlMain, setUrlMain] = useState('');
+    const [urlMain, setUrlMain] = useState(null);
     
     const refFlatList = useRef(null);
     useScrollToTop(refFlatList);
@@ -31,52 +31,71 @@ const Main = () => {
         }
     }, []);
 
+    // useEffect( async () => {
+    //     if(urlMain!=null){
+    //         const response = await fetch(urlMain + '/api/accounts/users/my_profile/', {
+    //             method: 'GET', // или 'PUT'
+    //             // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Authorization': 'Token ' + userKey,
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+    //         const json = await response.json();
+    //         console.log('Success:', JSON.stringify(json));
+    //         let jsonObj = JSON.parse(JSON.stringify(json));
+    //         await AsyncStorage.setItem('userID', jsonObj.id);
+    //         await AsyncStorage.setItem('userName', jsonObj.username);
+    //         console.log('IMAGESIMAGESIMAGESIMAGESIMAGESIMAGESIMAGES ' + jsonObj.id);
+    //         console.log(jsonObj);
+    //         /////////////////
+    //         console.log('images length' + jsonObj.username);
+    //     }
+    // }, [urlMain]);
+
     useEffect(async () => {
 
-        // let auth = await AsyncStorage.getItem('userKey')
-        // if (auth != null) {
-        //     setUserKey(auth);
-        //     console.log('USERKEYUSERKEYUSERKEYUSERKEYUSERKEYUSERKEY   ' + userKey)
-        // }
         const url = await AsyncStorage.getItem('urlMain')
-        // const data = { userKey: userKey };
 
         try {
-            const response = await fetch(url + '/pictures/', {
-                method: 'GET', // или 'PUT'
-                // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': 'Token ' + userKey,
-                    'Content-Type': 'application/json'
+            if(urlMain!=null){
+                const response = await fetch(urlMain + '/pictures/', {
+                    method: 'GET', // или 'PUT'
+                    // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Token ' + userKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const json = await response.json();
+                console.log('Success:', JSON.stringify(json));
+                let jsonObj = JSON.parse(JSON.stringify(json))
+                setImages(jsonObj.results)
+                console.log('IMAGESIMAGESIMAGESIMAGESIMAGESIMAGESIMAGES ' + images)
+                /////////////////
+                console.log('images length' + images.length)
+                if (images != null){
+                    let a = {};
+                    let b = {};
+                    images.map((item, index) => {
+                        a[item.picture_id] = item.rate
+                        b[item.picture_id] = item.is_liked
+                    })
+                    console.log('a    ' + a)
+                    console.log('b    ' + b)
+                    setListOfLikes(a);
+                    setLiked(b);
+                    console.log('listOfLikes ' + listOfLikes);
                 }
-            });
-            const json = await response.json();
-            console.log('Success:', JSON.stringify(json));
-            let jsonObj = JSON.parse(JSON.stringify(json))
-            setImages(jsonObj.results)
-            console.log('IMAGESIMAGESIMAGESIMAGESIMAGESIMAGESIMAGES ' + images)
-            /////////////////
-            console.log('images length' + images.length)
-            if (images != null){
-                let a = {};
-                let b = {};
-                images.map((item, index) => {
-                    a[item.picture_id] = item.rate
-                    b[item.picture_id] = item.is_liked
-                })
-                console.log('a    ' + a)
-                console.log('b    ' + b)
-                setListOfLikes(a);
-                setLiked(b);
-                console.log('listOfLikes ' + listOfLikes);
             }
             ///////////////////////
         } catch (error) {
             console.error('Error:', error);
         }
 
-    }, [userKey])
+    }, [userKey, urlMain])
 
     // useEffect( () => {
     //     console.log('images length' + images.length)

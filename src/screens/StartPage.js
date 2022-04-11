@@ -130,6 +130,7 @@ const StartPage = ({navigation}) => {
             console.log(json);
             await AsyncStorage.setItem('userKey', json.key);
             setIsAuth(true);
+
             navigation.navigate('Main');
           } catch (error) {
             console.error('ERROR');
