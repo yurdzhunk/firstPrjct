@@ -184,7 +184,7 @@ const Chat = ({navigation, route}) => {
                     <View style={{flex:9}}>
                         <Input 
                             autoCorrect={false}
-                            style={{fontSize: 24}}
+                            style={{fontSize: 18}}
                             placeholder='Type message...'
                             value={messageText}
                             onChangeText={value => {

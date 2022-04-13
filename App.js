@@ -17,6 +17,7 @@ import Voter from './src/screens/Voter'
 import ProfilePage from './src/screens/ProfilePage';
 import ChatsScreen from './src/screens/ChatsScreen';
 import Chat from './src/screens/Chat';
+import { Entypo, Feather, Octicons } from '@expo/vector-icons';
 
 export default function App() {
 
@@ -54,13 +55,13 @@ export default function App() {
   
     switch (route.name) {
       case 'Main':
-        iconName = 'home';
+        return <Octicons style={{marginBottom: 5}} name="home" size={32} color={color} />
         break;
         case 'Album':
         iconName = 'picture';
         break;
       case 'Photo':
-        iconName = 'camera';
+        return <Feather name="camera" size={32} color={color} />
         break;
       case 'Profile':
         iconName = 'user';
@@ -69,7 +70,7 @@ export default function App() {
         break;
     }
   
-    return <Icon name={iconName} color={color} size={24} />;
+    return <Icon name={iconName} color={color} size={32} />;
   };
 
   const titleOptions = (route) => {
@@ -106,9 +107,15 @@ export default function App() {
             tabBarIcon: ({color}) => screenOptions(route, color),
             tabBarHideOnKeyboard: false,
             tabBarStyle: [{display: 'flex'}],
-            headerTitle: titleOptions(route),
+            // headerTitle: titleOptions(route),
             headerShown: false,
-        })}
+            tabBarShowLabel: false,
+            tabBarActiveTintColor: 'darkred',
+            inactiveTintColor: 'lightgray',
+            // tabBarStyle: {
+            //   backgroundColor: 'darkred'
+            // }
+          })}
         >
           <Tab.Screen
               name="StartPage"
