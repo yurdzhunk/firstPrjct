@@ -5,6 +5,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { useIsFocused } from '@react-navigation/native'
 import { Input } from '@rneui/base';
 import useKeyboardHeight from 'react-native-use-keyboard-height';
+import PushNotification from './PushNotification';
+import * as Notifications from 'expo-notifications';
 
 
 const Chat = ({navigation, route}) => {
@@ -99,6 +101,7 @@ const Chat = ({navigation, route}) => {
                 console.log('OWNER')
                 console.log(dat.message.owner)
                 setServerMessages([...serverMessagesList]);
+                // schedulePushNotification(dat.message.text)
             // }
           }else{
             console.log('ELSE');
@@ -122,6 +125,7 @@ const Chat = ({navigation, route}) => {
             'message': messageText,
             'initiator_first_name': mainFirstName,
             'initiator_id': mainUserID,
+            'receiver_id': userID,
             'chat_id': chatID,
         }));
         setMessageText('')
@@ -190,12 +194,17 @@ const Chat = ({navigation, route}) => {
                             onChangeText={value => {
                                 setMessageText(value);
                                 console.log(value);
+                                if(value.length > 0){
+                                    setInputFieldEmpty(false)
+                                }else{
+                                    setInputFieldEmpty(true)
+                                }
                             }}
                         />
                     </View>
                     <View style={{flex:1}}>
-                        <TouchableOpacity style={{position: 'absolute', right: 15, top: 10}} onPress={submitMessage}>
-                            <FontAwesome name="send" size={24} color="black" />
+                        <TouchableOpacity style={{position: 'absolute', right: 15, top: 10}} onPress={submitMessage} disabled={inputFieldEmpty}>
+                            <FontAwesome name="send" size={24} color="black"/>
                         </TouchableOpacity>
                     </View>
                 </View>

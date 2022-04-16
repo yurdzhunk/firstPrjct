@@ -18,6 +18,7 @@ import ProfilePage from './src/screens/ProfilePage';
 import ChatsScreen from './src/screens/ChatsScreen';
 import Chat from './src/screens/Chat';
 import { Entypo, Feather, Octicons } from '@expo/vector-icons';
+import PushNotification from './src/screens/PushNotification'
 
 export default function App() {
 
@@ -158,6 +159,15 @@ export default function App() {
           <Tab.Screen
               name="Chat"
               component={Chat}
+              options={{
+                tabBarButton: () => null,
+                // tabBarVisible: false, // if you don't want to see the tab bar
+                // tabBarStyle: { display: "none" }
+              }}
+          />
+          <Tab.Screen
+              name="Noti"
+              component={PushNotification}
               options={{
                 tabBarButton: () => null,
                 // tabBarVisible: false, // if you don't want to see the tab bar
