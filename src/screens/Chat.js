@@ -138,6 +138,7 @@ const Chat = ({navigation, route}) => {
                 console.log('OWNER')
                 console.log(dat.message.owner)
                 setServerMessages([...serverMessagesList]);
+          }else{
             console.log('ELSE');
             console.log(dat.message.messages[0])
             console.log(dat.message.messages.length);
@@ -167,17 +168,36 @@ const Chat = ({navigation, route}) => {
     }
 
     const renderItem = ({ item }) => {
+        let date = new Date(item[1]);
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        if(hours < 10){
+            hours = String('0' + hours);
+        }
+        if(minutes < 10){
+            minutes = String('0' + minutes);
+        }
         if(item[2] === mainFirstName){
             return(
-                <View style={{borderRadius: 16, borderColor: 'black', borderWidth: 1, backgroundColor: 'lightgreen', paddingVertical: 3, paddingHorizontal: 10, marginVertical: 5, marginHorizontal: 5, alignSelf: 'flex-end' }}>
-                    <Text>{item[0]} <Text style={{color: 'silver'}}>{item[1]}</Text></Text>
+                <View style={{flexDirection: 'column'}}>
+                    <View style={{borderRadius: 16, borderColor: 'black', borderWidth: 1, backgroundColor: 'lightgreen', paddingVertical: 3, paddingHorizontal: 10, marginVertical: 5, marginHorizontal: 5, alignSelf: 'flex-end' }}>
+                        <Text>{item[0]}</Text>
+                    </View>
+                    <View style={{alignSelf: 'flex-end', paddingHorizontal: 10}}>
+                        <Text style={{color: 'silver'}}>{hours}:{minutes}</Text>
+                    </View>
                 </View>
             )
         }else{
             return(
-                <View style={{borderRadius: 16, borderColor: 'black', borderWidth: 1, backgroundColor: 'lightblue', paddingVertical: 3, paddingHorizontal: 10, marginVertical: 5, alignSelf: 'flex-start' }}>
-                    <Text>{item[0]} <Text style={{color: 'silver'}}>{item[1]}</Text></Text>
+                <>
+                <View style={{borderRadius: 16, borderColor: 'black', borderWidth: 1, backgroundColor: 'lightblue', paddingVertical: 3, paddingHorizontal: 10, marginVertical: 5,marginHorizontal: 5, alignSelf: 'flex-start' }}>
+                    <Text>{item[0]}</Text>
                 </View>
+                <View style={{alignSelf: 'flex-start', paddingHorizontal: 10}}>
+                    <Text style={{color: 'silver'}}>{hours}:{minutes}</Text>
+                </View>
+                </>
             )
         }
     };
@@ -221,7 +241,6 @@ const Chat = ({navigation, route}) => {
                 <View style={{flex: 1, backgroundColor: '#fff', paddingTop: 5, paddingLeft: 5, flexDirection: 'row'}}>
                     <View style={{flex:9}}>
                         <Input 
-                            autoCorrect={false}
                             style={{fontSize: 18}}
                             placeholder='Type message...'
                             value={messageText}

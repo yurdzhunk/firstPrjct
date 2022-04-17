@@ -174,6 +174,7 @@ export default function App() {
                 // tabBarVisible: false, // if you don't want to see the tab bar
                 // tabBarStyle: { display: "none" }
               }}
+              tabBarHideOnKeyboard={true}
           />
           <Tab.Screen
               name="Noti"
