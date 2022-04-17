@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView, AppState } from 'react-native';
 import { AntDesign, Entypo, FontAwesome } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useIsFocused } from '@react-navigation/native'
@@ -12,6 +12,9 @@ import * as Notifications from 'expo-notifications';
 const Chat = ({navigation, route}) => {
 
     const h = useKeyboardHeight();
+    
+    const appState = useRef(AppState.currentState);
+    const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
     const { userID, avatar, nickname, chatKey, chatID, mainUserID, mainUsername, userKey, urlMain, mainFirstName } = route.params;
     const [serverState, setServerState] = useState('Loading...');
@@ -31,6 +34,38 @@ const Chat = ({navigation, route}) => {
         console.log(chatKey);
     }, []);
 
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", nextAppState => {
+          if (
+            appState.current.match(/active|foreground/) &&
+            nextAppState === "inactive"
+          ) {
+            console.log("App has come to the background!");
+            // console.log('CLOSE WS')
+            // console.log(ws)
+            // ws.close();
+          }
+
+          if (
+            appState.current.match(/inactive|background/) &&
+            nextAppState === "active"
+          ) {
+            console.log("App has come to the foreground!");
+            // console.log('OPEN WS')
+            // var socket = new WebSocket('wss://daily-foto-shot.herokuapp.com/ws/chat/' + chatKey + '/');
+            // setWs(socket);
+          }
+    
+          appState.current = nextAppState;
+          setAppStateVisible(appState.current);
+          console.log("AppState", appState.current);
+        });
+    
+        // return () => {
+        //   subscription.remove();
+        // };
+      }, []);
+
     // var ws = useRef(new WebSocket('wss://daily-foto-shot.herokuapp.com/ws/chat/' + chatKey + '/')).current;
 
     useEffect(() => {
@@ -39,7 +74,9 @@ const Chat = ({navigation, route}) => {
             setWs(socket);
             setWsOpen(!wsOpen);
             setServerMessages([]);
+            console.log('ISFOCUSED_OPEN')
         }else{
+            console.log('ISFOCUSED_CLOSE')
             ws.close()
             setWsOpen(!wsOpen);
         }
@@ -77,6 +114,7 @@ const Chat = ({navigation, route}) => {
     //     var ws = useRef(new WebSocket('wss://daily-foto-shot.herokuapp.com/ws/chat/' + chatKey + '/')).current;
     // }, [chatKey]);
 
+
     useEffect(() => {
         const serverMessagesList = [];
         ws.onopen = () => {
@@ -96,14 +134,10 @@ const Chat = ({navigation, route}) => {
         //   let jsonObj = JSON.parse(JSON.stringify(e.data))
           let dat = JSON.parse(e.data);
           if(dat.message.message_type === 'new'){
-            // if(dat.message.owner!==mainUsername){
                 serverMessagesList.push([dat.message.text, dat.message.date, dat.message.owner, dat.message.date_mls]);
                 console.log('OWNER')
                 console.log(dat.message.owner)
                 setServerMessages([...serverMessagesList]);
-                // schedulePushNotification(dat.message.text)
-            // }
-          }else{
             console.log('ELSE');
             console.log(dat.message.messages[0])
             console.log(dat.message.messages.length);
@@ -113,7 +147,7 @@ const Chat = ({navigation, route}) => {
             setServerMessages([...serverMessagesList]);
           }
         };
-      }, [ws, isFocused])
+      }, [ws])
 
 
     const submitMessage = () => {

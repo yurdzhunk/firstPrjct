@@ -68,7 +68,7 @@ async function schedulePushNotification() {
       body: 'How your breakfest looks like?',
       data: { data: 'goes here' },
     },
-    trigger: { seconds: 3 },
+    trigger: { seconds: 1 },
   });
 }
 
