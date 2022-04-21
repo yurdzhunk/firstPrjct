@@ -7,8 +7,8 @@ import {AntDesign, FontAwesome, Feather, FontAwesome5, Entypo} from "@expo/vecto
 
 const ProfilePage = ({navigation}) => {
 
-    const [urlMain, setUrlMain] = useState('');
-    const [userKey, setUserKey] = useState('');
+    const [urlMain, setUrlMain] = useState(null);
+    const [userKey, setUserKey] = useState(null);
     const [images, setImages] = useState([]);
     const [listOfLikes, setListOfLikes] = useState({});
     const [liked, setLiked] = useState({});
@@ -43,8 +43,8 @@ const ProfilePage = ({navigation}) => {
         // const url = await AsyncStorage.getItem('urlMain')
         // const data = { userKey: userKey };
 
-        // try {
-            if(urlMain!=null){
+        try {
+            if(urlMain!=null && userKey!=null){
                 const response = await fetch(urlMain + '/api/accounts/users/my_profile/', {
                     method: 'GET', // или 'PUT'
                     // body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
@@ -66,11 +66,11 @@ const ProfilePage = ({navigation}) => {
                 setIsLoaded(!isLoaded);
             }
             ///////////////////////
-        // } catch (error) {
-        //     console.error('Error:', error);
-        // }
+        } catch (error) {
+            console.error('Error:', error);
+        }
 
-    }, [userKey, urlMain])
+    }, [urlMain, userKey])
 
     useEffect(() => {
         if (images != null){

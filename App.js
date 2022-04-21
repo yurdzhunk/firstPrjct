@@ -20,6 +20,9 @@ import Chat from './src/screens/Chat';
 import { Entypo, Feather, Octicons } from '@expo/vector-icons';
 import PushNotification from './src/screens/PushNotification'
 import { Chatting } from './src/screens/Chatting';
+import { createStackNavigator } from '@react-navigation/stack';
+
+
 
 export default function App() {
 
@@ -51,6 +54,22 @@ export default function App() {
   });
 
   const Tab = createBottomTabNavigator();
+  const Stack = createStackNavigator();
+
+  const ChatScreenNavigator = () =>{
+    return(
+          <Stack.Navigator
+            cardOverlayEnabled={true}
+            screenOptions={{
+              headerShown: false,
+              cardOverlayEnabled: true
+            }}
+          >
+              <Stack.Screen name="Chats" component={ChatsScreen}/>
+              <Stack.Screen name="Chat" component={Chat}/>
+          </Stack.Navigator>
+    )
+  }
 
   const screenOptions = (route, color) => {
     let iconName;
@@ -98,6 +117,8 @@ export default function App() {
 
     return titleName
   }
+
+  
 
  
     return (
@@ -150,14 +171,14 @@ export default function App() {
           />
            <Tab.Screen
               name="ChatsScreen"
-              component={ChatsScreen}
+              component={ChatScreenNavigator}
               options={{
                 tabBarButton: () => null,
                 // tabBarVisible: false, // if you don't want to see the tab bar
                 // tabBarStyle: { display: "none" }
               }}
           />
-          <Tab.Screen
+          {/* <Tab.Screen
               name="Chat"
               component={Chat}
               options={{
@@ -165,17 +186,17 @@ export default function App() {
                 // tabBarVisible: false, // if you don't want to see the tab bar
                 // tabBarStyle: { display: "none" }
               }}
-          />
-          <Tab.Screen
+          /> */}
+          {/* <Tab.Screen
               name="Chatting"
-              component={Chatting}
+              component={ChatScreenNavigator}
               options={{
                 tabBarButton: () => null,
                 // tabBarVisible: false, // if you don't want to see the tab bar
                 // tabBarStyle: { display: "none" }
               }}
               tabBarHideOnKeyboard={true}
-          />
+          /> */}
           <Tab.Screen
               name="Noti"
               component={PushNotification}

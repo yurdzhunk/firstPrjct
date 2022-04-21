@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useRef} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView, AppState } from 'react-native';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView, AppState, TextInput } from 'react-native';
 import { AntDesign, Entypo, FontAwesome } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useIsFocused } from '@react-navigation/native'
@@ -24,6 +24,24 @@ const Chat = ({navigation, route}) => {
     const [serverMessages, setServerMessages] = useState([]);
     const [wsOpen, setWsOpen] = useState(false);
 
+    const [showScrollBottomButton, setShowScrollBottomButton] = useState(false)
+    const flatlistRef = useRef()
+
+    const months = {
+        0: 'January',
+        1: 'February',
+        2: 'March',
+        3: 'April',
+        4: 'May',
+        5: 'June',
+        6: 'July',
+        7: 'August',
+        8: 'September',
+        9: 'October',
+        10: 'November',
+        11: 'December',
+    }
+
     const isFocused = useIsFocused()
 
     const [ws, setWs] = useState({});
@@ -34,46 +52,45 @@ const Chat = ({navigation, route}) => {
         console.log(chatKey);
     }, []);
 
-    useEffect(() => {
-        const subscription = AppState.addEventListener("change", nextAppState => {
-          if (
-            appState.current.match(/active|foreground/) &&
-            nextAppState === "inactive"
-          ) {
-            console.log("App has come to the background!");
-            // console.log('CLOSE WS')
-            // console.log(ws)
-            // ws.close();
-          }
+    // useEffect(() => {
+    //     const subscription = AppState.addEventListener("change", nextAppState => {
+    //       if (
+    //         appState.current.match(/active|foreground/) &&
+    //         nextAppState === "inactive"
+    //       ) {
+    //         console.log("App has come to the background!");
+    //         // console.log('CLOSE WS')
+    //         // console.log(ws)
+    //         // ws.close();
+    //       }
 
-          if (
-            appState.current.match(/inactive|background/) &&
-            nextAppState === "active"
-          ) {
-            console.log("App has come to the foreground!");
-            // console.log('OPEN WS')
-            // var socket = new WebSocket('wss://daily-foto-shot.herokuapp.com/ws/chat/' + chatKey + '/');
-            // setWs(socket);
-          }
+    //       if (
+    //         appState.current.match(/inactive|background/) &&
+    //         nextAppState === "active"
+    //       ) {
+    //         console.log("App has come to the foreground!");
+    //         // console.log('OPEN WS')
+    //         // var socket = new WebSocket('wss://daily-foto-shot.herokuapp.com/ws/chat/' + chatKey + '/');
+    //         // setWs(socket);
+    //       }
     
-          appState.current = nextAppState;
-          setAppStateVisible(appState.current);
-          console.log("AppState", appState.current);
-        });
+    //       appState.current = nextAppState;
+    //       setAppStateVisible(appState.current);
+    //       console.log("AppState", appState.current);
+    //     });
     
-        // return () => {
-        //   subscription.remove();
-        // };
-      }, []);
+    //     // return () => {
+    //     //   subscription.remove();
+    //     // };
+    //   }, []);
 
-    // var ws = useRef(new WebSocket('wss://daily-foto-shot.herokuapp.com/ws/chat/' + chatKey + '/')).current;
 
     useEffect(() => {
         if(!wsOpen){
             var socket = new WebSocket('wss://daily-foto-shot.herokuapp.com/ws/chat/' + chatKey + '/');
             setWs(socket);
             setWsOpen(!wsOpen);
-            setServerMessages([]);
+            // setServerMessages([]);
             console.log('ISFOCUSED_OPEN')
         }else{
             console.log('ISFOCUSED_CLOSE')
@@ -134,6 +151,11 @@ const Chat = ({navigation, route}) => {
         //   let jsonObj = JSON.parse(JSON.stringify(e.data))
           let dat = JSON.parse(e.data);
           if(dat.message.message_type === 'new'){
+                // let date_1 = new Date(dat.message.date);
+                // let date_2 = new Date(serverMessagesList[-1]);
+                // if(date_1.getDate() > date_2.getDate()){
+                //     serverMessagesList.push([date_1.getDate() + ' ' + months[date_2.getMonth()], '', 'date'])
+                // }
                 serverMessagesList.push([dat.message.text, dat.message.date, dat.message.owner, dat.message.date_mls]);
                 console.log('OWNER')
                 console.log(dat.message.owner)
@@ -167,37 +189,58 @@ const Chat = ({navigation, route}) => {
         setInputFieldEmpty(true)
     }
 
+    const handleScroll = (event) => {
+        let yOffset = event.nativeEvent.contentOffset.y
+        if(yOffset > 250){
+            setShowScrollBottomButton(true);
+        }else{
+            setShowScrollBottomButton(false)
+        }
+    }
+
+    const scrollToBottom = () => {
+        flatlistRef.current.scrollToOffset(0);
+    }
+
     const renderItem = ({ item }) => {
-        let date = new Date(item[1]);
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        if(hours < 10){
-            hours = String('0' + hours);
-        }
-        if(minutes < 10){
-            minutes = String('0' + minutes);
-        }
+        // let date = new Date(item[1]);
+        // let hours = date.getHours();
+        // let minutes = date.getMinutes();
+        // if(hours < 10){
+        //     hours = String('0' + hours);
+        // }
+        // if(minutes < 10){
+        //     minutes = String('0' + minutes);
+        // }
         if(item[2] === mainFirstName){
             return(
-                <View style={{flexDirection: 'column'}}>
-                    <View style={{borderRadius: 16, borderColor: 'black', borderWidth: 1, backgroundColor: 'lightgreen', paddingVertical: 3, paddingHorizontal: 10, marginVertical: 5, marginHorizontal: 5, alignSelf: 'flex-end' }}>
+                <View key={item[3]} style={{flexDirection: 'column'}}>
+                    <View style={styles.userMessage}>
                         <Text>{item[0]}</Text>
                     </View>
                     <View style={{alignSelf: 'flex-end', paddingHorizontal: 10}}>
-                        <Text style={{color: 'silver'}}>{hours}:{minutes}</Text>
+                        <Text style={{color: 'silver', fontSize: 10}}>{item[1]}</Text>
                     </View>
                 </View>
             )
-        }else{
+        }
+        if(item[2] === 'date'){
             return(
-                <>
-                <View style={{borderRadius: 16, borderColor: 'black', borderWidth: 1, backgroundColor: 'lightblue', paddingVertical: 3, paddingHorizontal: 10, marginVertical: 5,marginHorizontal: 5, alignSelf: 'flex-start' }}>
+                <View style={styles.dateMessage}>
                     <Text>{item[0]}</Text>
                 </View>
-                <View style={{alignSelf: 'flex-start', paddingHorizontal: 10}}>
-                    <Text style={{color: 'silver'}}>{hours}:{minutes}</Text>
+            )
+        }
+        else{
+            return(
+                <View key={item[3]} style={{flexDirection: 'column'}}>
+                    <View style={styles.guestMessage}>
+                        <Text style={{color: '#fff'}}>{item[0]}</Text>
+                    </View>
+                    <View style={{alignSelf: 'flex-start', paddingHorizontal: 10}}>
+                        <Text style={{color: 'silver', fontSize: 10}}>{item[1]}</Text>
+                    </View>
                 </View>
-                </>
             )
         }
     };
@@ -206,8 +249,8 @@ const Chat = ({navigation, route}) => {
 
     return (
         <View style={{ flex: 1}}>
-            <View style={{flexDirection: 'row', backgroundColor: '#fff', justifyContent: 'center'}}>
-                <TouchableOpacity style={{position: 'absolute', left: 5, top: 5}} onPress={() => navigation.navigate('ChatsScreen')}>
+            <View style={{flexDirection: 'row', backgroundColor: '#fff', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: 'silver'}}>
+                <TouchableOpacity style={{position: 'absolute', left: 5, top: 5}} onPress={() => navigation.navigate('Chats')}>
                     <Text style={{fontSize: 18}}><AntDesign name='left' size={26} color='#000' /> Back</Text>
                 </TouchableOpacity>
                 <View >
@@ -227,21 +270,31 @@ const Chat = ({navigation, route}) => {
                     })()
                 }
             >
-                <View style={{flex: 8}}>
+                <View style={{flex: 8, paddingBottom: 3}}>
                     <FlatList
-                        initialNumToRender={10}
+                        ref={flatlistRef}
+                        style={{backgroundColor: '#fff'}}
+                        initialNumToRender={5}
+                        maxToRenderPerBatch={10}
                         inverted
                         data={serverMessages.slice().sort(
                             (a,b) => a[3].valueOf() - b[3].valueOf()
                             ).reverse()}
                         renderItem={renderItem}
                         keyExtractor={keyExtractor}
+                        onScroll={handleScroll}
                     />
+                    {showScrollBottomButton
+                    ?<TouchableOpacity style={styles.scrollBottomButton} onPress={scrollToBottom}>
+                        <AntDesign name="down" size={24} color="white" />
+                     </TouchableOpacity>
+                    :<></>
+                    }
                 </View>
-                <View style={{flex: 1, backgroundColor: '#fff', paddingTop: 5, paddingLeft: 5, flexDirection: 'row'}}>
-                    <View style={{flex:9}}>
-                        <Input 
-                            style={{fontSize: 18}}
+                <View style={{flex: 1, backgroundColor: '#fff', paddingTop: 5, paddingLeft: 5, flexDirection: 'row', borderTopWidth: 1, borderTopColor: 'silver'}}>
+                    <View style={{flex:9, paddingTop: 8}}>
+                        <TextInput 
+                            style={{fontSize: 18, borderRadius: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: 'silver', height: 30, paddingHorizontal: 5}}
                             placeholder='Type message...'
                             value={messageText}
                             onChangeText={value => {
@@ -255,7 +308,7 @@ const Chat = ({navigation, route}) => {
                             }}
                         />
                     </View>
-                    <View style={{flex:1}}>
+                    <View style={{flex:1, paddingLeft: 5}}>
                         <TouchableOpacity style={{position: 'absolute', right: 15, top: 10}} onPress={submitMessage} disabled={inputFieldEmpty}>
                             <FontAwesome name="send" size={24} color="black"/>
                         </TouchableOpacity>
@@ -275,6 +328,61 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 3,
         marginLeft: 3
+    },
+    miniAvatar: {
+        height: 20,
+        width: 20,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 3,
+        marginLeft: 3
+    },
+    userMessage: {
+        borderRadius: 16,
+        shadowColor: 'grey',
+        shadowOpacity: 0.3,
+        backgroundColor: '#FFF8DC', 
+        paddingVertical: 3, 
+        paddingHorizontal: 10, 
+        marginTop: 7 ,
+        marginBottom: 3,
+        marginHorizontal: 5, 
+        alignSelf: 'flex-end'
+    },
+    guestMessage: {
+        borderRadius: 16,
+        shadowColor: 'grey',
+        shadowOpacity: 0.3,
+        backgroundColor: '#6495ED', 
+        paddingVertical: 3, 
+        paddingHorizontal: 10, 
+        marginTop: 7 ,
+        marginBottom: 3,
+        marginHorizontal: 5, 
+        alignSelf: 'flex-start'
+    },
+    dateMessage: {
+        alignSelf: 'center',
+        backgroundColor: 'silver',
+        opacity: 0.3,
+        borderRadius: 16,
+        marginTop: 7,
+        marginBottom: 3,
+        paddingVertical: 3, 
+        paddingHorizontal: 10
+    },
+    scrollBottomButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        height: 40,
+        width: 40,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'silver',
+        opacity: 0.7
     }
 })
 

@@ -24,9 +24,9 @@ const Navbar = () => {
             <TouchableOpacity style={{position: 'absolute', right: 10}} onPress={() => {navigation.navigate('ChatsScreen')}}>
                 <Entypo name="chat" size={30} color="grey" />
             </TouchableOpacity>
-            <TouchableOpacity style={{position: 'absolute', right: 100}} onPress={() => {navigation.navigate('Chatting')}}>
+            {/* <TouchableOpacity style={{position: 'absolute', right: 100}} onPress={() => {navigation.navigate('Chatting')}}>
                 <Entypo name="chat" size={30} color="grey" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     );
 };
