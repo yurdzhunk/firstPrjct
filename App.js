@@ -133,7 +133,7 @@ export default function App() {
             // headerTitle: titleOptions(route),
             headerShown: false,
             tabBarShowLabel: false,
-            tabBarActiveTintColor: 'darkred',
+            tabBarActiveTintColor: 'darkgreen',
             inactiveTintColor: 'lightgray',
             // tabBarStyle: {
             //   backgroundColor: 'darkred'

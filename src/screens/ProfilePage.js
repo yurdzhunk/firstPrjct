@@ -175,7 +175,7 @@ const ProfilePage = ({navigation}) => {
                 <View style={styles.profileBlock}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10, paddingVertical: 10}}>
                         <View style={{flex: 1}}>
-                            <Image style={styles.avatar} source={{uri: profileInfo.profile_picture_thumbnail_big}}/>
+                            <Image style={styles.avatar} source={{uri: profileInfo.profile_picture_thumbnail_small}}/>
                         </View>
                         <View style={{flex: 2, flexDirection: 'column'}}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1, alignItems: 'center', paddingHorizontal: 30}}>

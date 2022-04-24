@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { View, StyleSheet, Text, Image, ScrollView, Pressable, TouchableOpacity, Button, FlatList } from 'react-native';
+import { View, StyleSheet, Text, Image, ScrollView, Pressable, TouchableOpacity, Button, FlatList, Dimensions } from 'react-native';
 import Home from "./Home";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AntDesign, FontAwesome, Feather, FontAwesome5, Entypo} from "@expo/vector-icons";
@@ -198,7 +198,7 @@ const Main = () => {
                 <Image style={styles.avatar} source={{uri: item.owner.profile_picture_thumbnail_small}}/>
                 <Text style={{ fontWeight: 'bold', marginTop: 11, marginLeft: 5}}>{item.username}</Text>
             </View>
-            <Image style={styles.cardImage} source={{uri: item.thumbnail_big_url}}/>
+            <Image  style={styles.cardImage} source={{uri: item.thumbnail_big_url}}/>
             <View style={{ flexDirection: 'row'}}>
                 <TouchableOpacity
                     onPress={() => likeImage(item.picture_id)}

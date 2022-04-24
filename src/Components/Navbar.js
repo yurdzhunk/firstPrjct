@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
     text: {
-        color: 'darkred',
+        color: 'darkgreen',
         fontSize: 26,
         fontWeight: 'bold'
     }

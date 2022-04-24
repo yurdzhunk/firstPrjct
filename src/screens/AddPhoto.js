@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {Text, View, Button, StyleSheet, Alert, TouchableOpacity, Dimensions, Image, TextInput, Modal} from 'react-native';
+import {Text, View, Button, StyleSheet, Alert, TouchableOpacity, Dimensions, Image, TextInput, Modal, ScrollView} from 'react-native';
 import { Camera } from 'expo-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
@@ -143,17 +143,13 @@ const AddPhoto = ({navigation}) => {
 
         const formData = new FormData();
         formData.append('picture_file', { uri: image, name: image.toString()});
-        let key = await AsyncStorage.getItem('userKey')
-        // let auth = await AsyncStorage.getItem('userKey');
-
-        // let auth = await AsyncStorage.getItem('userKey');
         const response = await fetch(
             'https://daily-foto-shot.herokuapp.com/pictures/post_new/',
             {
                 method: 'POST',
                 headers: {
                 'Accept': 'application/json',
-                'Authorization': 'Token ' + key,
+                'Authorization': 'Token ' + userKey,
                 'Content-Type': 'multipart/form-data'
                 },
                 body: formData
@@ -180,24 +176,34 @@ const AddPhoto = ({navigation}) => {
                     {isPreview && (
                         <View style={styles.container}>
                             <View >
-                                <Image source={{ uri: image }} style={isShot ? { minWidth: '100%', minHeight: '100%' } : { minWidth: '100%', minHeight: '50%' }} blurRadius={blur}/>
+                                <Image source={{ uri: image }} style={isShot ? { minWidth: '100%', minHeight: '100%' } : { minWidth: '100%', minHeight: '50%'}}/>
                             </View>
                                 <Modal
                                     animationType="fade"
+                                    // transparent={true}
                                     presentationStyle='pageSheet'
                                     visible={modalVisible}
                                     onRequestClose={() => {
                                         setModalVisible(!modalVisible);
                                     }}
                                     onSwipeOut={() => setModalVisible(false)}
-                                >
-                                    <TextInput placeholder='nfnsfk' style={{ height: 300, width: 300}}/>
-                                    <TouchableOpacity style={{backgroundColor: 'lightblue', width: '30%'}} onPress={() => postCaption()}>
-                                        <Text style={{ fontSize: 30}}>Submit</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{backgroundColor: 'red', width: '30%'}} onPress={() => setModalVisible(false)}>
-                                        <Text style={{ fontSize: 30}}>Cancel</Text>
-                                    </TouchableOpacity>
+                                >   
+                                <ScrollView style={{flex:1}}>
+                                    <View>
+                                        <Image source={{ uri: image }} style={{height: 500, width:WINDOW_WIDTH}}/>
+                                    </View>
+                                    <View style={{borderWidth: 1, borderColor: 'grey', shadowOpacity:0.7, shadowColor: 'grey', justifyContent: 'flex', alignItems: 'flex', marginHorizontal: 10, marginVertical: 10 , borderRadius: 16}}>
+                                        <TextInput placeholder='Type in description...' style={{ height: 100, width: WINDOW_WIDTH, marginHorizontal: 10}} multiline={true}/>
+                                    </View>
+                                    <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 30}}>
+                                        <TouchableOpacity style={{backgroundColor: 'lightblue', width: '40%', alignItems: 'center', borderRadius: 16, shadowOpacity: 0.3}} onPress={() => postCaption()}>
+                                            <Text style={{ fontSize: 30}}>Submit</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={{backgroundColor: 'red', width: '40%', alignItems: 'center', borderRadius: 16, shadowOpacity: 0.3}} onPress={() => setModalVisible(false)}>
+                                            <Text style={{ fontSize: 30}}>Cancel</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </ScrollView>
                                 </Modal>
                             <View style={styles.container}>
                                 <TouchableOpacity
@@ -210,7 +216,7 @@ const AddPhoto = ({navigation}) => {
                             </View>
                             <View style={{ alignItems: 'center'}}>
                                 <TouchableOpacity style={styles.caption} onPress={() => addCaption()}>
-                                    <Text style={{ fontSize: 26, color: 'white'}}>Add a caption</Text>
+                                    <Text style={{ fontSize: 26, color: 'white'}}>Go!</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.push} onPress={() => pushPhoto()}>
                                     <Text style={{ fontSize: 26, color: 'white'}}>Push</Text>

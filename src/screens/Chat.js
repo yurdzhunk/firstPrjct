@@ -7,6 +7,7 @@ import { Input } from '@rneui/base';
 import useKeyboardHeight from 'react-native-use-keyboard-height';
 import PushNotification from './PushNotification';
 import * as Notifications from 'expo-notifications';
+import gif from '../../assets/writing-hand.gif'
 
 
 const Chat = ({navigation, route}) => {
@@ -16,7 +17,7 @@ const Chat = ({navigation, route}) => {
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
-    const { userID, avatar, nickname, chatKey, chatID, mainUserID, mainUsername, userKey, urlMain, mainFirstName } = route.params;
+    const { userID, avatar, nickname, firstname, chatKey, chatID, mainUserID, mainUsername, userKey, urlMain, mainFirstName } = route.params;
     const [serverState, setServerState] = useState('Loading...');
     const [messageText, setMessageText] = useState('');
     const [disableButton, setDisableButton] = useState(true);
@@ -26,6 +27,8 @@ const Chat = ({navigation, route}) => {
 
     const [showScrollBottomButton, setShowScrollBottomButton] = useState(false)
     const flatlistRef = useRef()
+
+    // const [isTyping, setIsTyping] = useState(false)
 
     const months = {
         0: 'January',
@@ -134,6 +137,7 @@ const Chat = ({navigation, route}) => {
 
     useEffect(() => {
         const serverMessagesList = [];
+        var isTyping = false;
         ws.onopen = () => {
           setServerState('Connected to the server')
           setDisableButton(false);
@@ -151,15 +155,37 @@ const Chat = ({navigation, route}) => {
         //   let jsonObj = JSON.parse(JSON.stringify(e.data))
           let dat = JSON.parse(e.data);
           if(dat.message.message_type === 'new'){
-                // let date_1 = new Date(dat.message.date);
-                // let date_2 = new Date(serverMessagesList[-1]);
-                // if(date_1.getDate() > date_2.getDate()){
-                //     serverMessagesList.push([date_1.getDate() + ' ' + months[date_2.getMonth()], '', 'date'])
-                // }
-                serverMessagesList.push([dat.message.text, dat.message.date, dat.message.owner, dat.message.date_mls]);
-                console.log('OWNER')
-                console.log(dat.message.owner)
-                setServerMessages([...serverMessagesList]);
+                if(dat.message.owner === 'typing'){
+                    console.log('TYPING');
+                    if(isTyping === false){
+                        console.log('isTYPING')
+                        console.log(isTyping)
+                        isTyping = true;
+                        console.log(isTyping)
+                        serverMessagesList.push([dat.message.text, dat.message.date, dat.message.owner, dat.message.date_mls]);
+                        setServerMessages([...serverMessagesList]);
+                        setTimeout(function() {
+                            console.log('TIMEOUT')
+                            if(isTyping === true){
+                                console.log('TIMEOUT in IF');
+                                isTyping = false;
+                                serverMessagesList.pop();
+                                setServerMessages([...serverMessagesList]);
+                            }
+                        }
+                        , 5000);
+                    }
+                }else{
+                    if(isTyping === true){
+                        isTyping = false;
+                        serverMessagesList.pop()
+                        setServerMessages([...serverMessagesList]);
+                    }
+                    serverMessagesList.push([dat.message.text, dat.message.date, dat.message.owner, dat.message.date_mls]);
+                    console.log('OWNER')
+                    console.log(dat.message.owner)
+                    setServerMessages([...serverMessagesList]);
+                }
           }else{
             console.log('ELSE');
             console.log(dat.message.messages[0])
@@ -189,6 +215,16 @@ const Chat = ({navigation, route}) => {
         setInputFieldEmpty(true)
     }
 
+    const onInputChange = () => {
+        ws.send(JSON.stringify({
+            'message': 'typing',
+            'initiator_first_name': mainFirstName,
+            'initiator_id': mainUserID,
+            'receiver_id': userID,
+            'chat_id': chatID,
+        }));
+    }
+
     const handleScroll = (event) => {
         let yOffset = event.nativeEvent.contentOffset.y
         if(yOffset > 250){
@@ -203,15 +239,6 @@ const Chat = ({navigation, route}) => {
     }
 
     const renderItem = ({ item }) => {
-        // let date = new Date(item[1]);
-        // let hours = date.getHours();
-        // let minutes = date.getMinutes();
-        // if(hours < 10){
-        //     hours = String('0' + hours);
-        // }
-        // if(minutes < 10){
-        //     minutes = String('0' + minutes);
-        // }
         if(item[2] === mainFirstName){
             return(
                 <View key={item[3]} style={{flexDirection: 'column'}}>
@@ -231,7 +258,15 @@ const Chat = ({navigation, route}) => {
                 </View>
             )
         }
-        else{
+        if(item[2] === 'typing'){
+            return(
+                <View style={styles.typingMessage}>
+                    <Text style={{color: '#fff'}}>typing...</Text>
+                </View>
+                // <Image style={{height: 30, width: 40, transform: [{rotateY: '180deg'}], backgroundColor: '#fff'}} source={gif}/>
+            )
+        }
+        if(item[2] === firstname){
             return(
                 <View key={item[3]} style={{flexDirection: 'column'}}>
                     <View style={styles.guestMessage}>
@@ -298,6 +333,7 @@ const Chat = ({navigation, route}) => {
                             placeholder='Type message...'
                             value={messageText}
                             onChangeText={value => {
+                                onInputChange();
                                 setMessageText(value);
                                 console.log(value);
                                 if(value.length > 0){
@@ -355,6 +391,18 @@ const styles = StyleSheet.create({
         shadowColor: 'grey',
         shadowOpacity: 0.3,
         backgroundColor: '#6495ED', 
+        paddingVertical: 3, 
+        paddingHorizontal: 10, 
+        marginTop: 7 ,
+        marginBottom: 3,
+        marginHorizontal: 5, 
+        alignSelf: 'flex-start'
+    },
+    typingMessage: {
+        borderRadius: 16,
+        shadowColor: 'grey',
+        shadowOpacity: 0.3,
+        backgroundColor: 'lightgrey', 
         paddingVertical: 3, 
         paddingHorizontal: 10, 
         marginTop: 7 ,
